@@ -1,0 +1,267 @@
+[
+  {
+    "_id": "672e8101a1b2c3d4e5f60001",
+    "student_number": "WMIT2026001",
+    "first_name": "Ada",
+    "last_name": "Okafor",
+    "email": "ada.okafor@example.edu",
+    "phone": "+2348000000001",
+    "admission_date": "2026-09-01",
+    "student_status": "Active",
+    "programme": {
+      "programme_code": "MIT",
+      "programme_name": "Master of Information Technology",
+      "award_level": "Masters",
+      "duration_years": 2,
+      "department": {
+        "department_code": "SCT",
+        "department_name": "School of Computing and Technology",
+        "office_location": "Block A"
+      }
+    },
+    "academic_records": [
+      {
+        "session_name": "2026/2027",
+        "semester": "First",
+        "courses": [
+          {
+            "course_code": "MIT8103",
+            "course_title": "Advanced Database Systems",
+            "credit_units": 3,
+            "lecturer_name": "Chika Nwosu",
+            "assessment_score": 32.0,
+            "examination_score": 51.0,
+            "total_score": 83.0,
+            "grade": "A",
+            "grade_point": 5.0,
+            "result_remarks": "Pass"
+          },
+          {
+            "course_code": "MIT8105",
+            "course_title": "Network Architecture and Protocols",
+            "credit_units": 3,
+            "lecturer_name": "Ibrahim Yusuf",
+            "assessment_score": 29.0,
+            "examination_score": 45.0,
+            "total_score": 74.0,
+            "grade": "A",
+            "grade_point": 5.0,
+            "result_remarks": "Pass"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "_id": "672e8101a1b2c3d4e5f60002",
+    "student_number": "WMIT2026002",
+    "first_name": "Tunde",
+    "last_name": "Bello",
+    "email": "tunde.bello@example.edu",
+    "phone": "+2348000000002",
+    "admission_date": "2026-09-01",
+    "student_status": "Active",
+    "programme": {
+      "programme_code": "MIT",
+      "programme_name": "Master of Information Technology",
+      "award_level": "Masters",
+      "duration_years": 2,
+      "department": {
+        "department_code": "SCT",
+        "department_name": "School of Computing and Technology",
+        "office_location": "Block A"
+      }
+    },
+    "academic_records": [
+      {
+        "session_name": "2026/2027",
+        "semester": "First",
+        "courses": [
+          {
+            "course_code": "MIT8103",
+            "course_title": "Advanced Database Systems",
+            "credit_units": 3,
+            "lecturer_name": "Chika Nwosu",
+            "assessment_score": 28.0,
+            "examination_score": 42.0,
+            "total_score": 70.0,
+            "grade": "B",
+            "grade_point": 4.0,
+            "result_remarks": "Pass"
+          },
+          {
+            "course_code": "MIT8105",
+            "course_title": "Network Architecture and Protocols",
+            "credit_units": 3,
+            "lecturer_name": "Ibrahim Yusuf",
+            "assessment_score": 24.0,
+            "examination_score": 38.0,
+            "total_score": 62.0,
+            "grade": "B",
+            "grade_point": 4.0,
+            "result_remarks": "Pass"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "_id": "672e8101a1b2c3d4e5f60003",
+    "student_number": "WCS2026001",
+    "first_name": "Amaka",
+    "last_name": "Eze",
+    "email": "amaka.eze@example.edu",
+    "phone": "+2348000000003",
+    "admission_date": "2026-09-01",
+    "student_status": "Active",
+    "programme": {
+      "programme_code": "BSC-CS",
+      "programme_name": "BSc Computer Science",
+      "award_level": "Undergraduate",
+      "duration_years": 4,
+      "department": {
+        "department_code": "SCT",
+        "department_name": "School of Computing and Technology",
+        "office_location": "Block A"
+      }
+    },
+    "academic_records": [
+      {
+        "session_name": "2026/2027",
+        "semester": "First",
+        "courses": [
+          {
+            "course_code": "CSC2101",
+            "course_title": "Database Systems Foundations",
+            "credit_units": 3,
+            "lecturer_name": "Chika Nwosu",
+            "assessment_score": 35.0,
+            "examination_score": 53.0,
+            "total_score": 88.0,
+            "grade": "A",
+            "grade_point": 5.0,
+            "result_remarks": "Pass"
+          },
+          {
+            "course_code": "CSC2102",
+            "course_title": "Data Structures and Algorithms",
+            "credit_units": 4,
+            "lecturer_name": "Oluwaseun Ogunleye",
+            "assessment_score": 31.0,
+            "examination_score": 46.0,
+            "total_score": 77.0,
+            "grade": "A",
+            "grade_point": 5.0,
+            "result_remarks": "Pass"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "_id": "672e8101a1b2c3d4e5f60004",
+    "student_number": "WMBA2026001",
+    "first_name": "Chinedu",
+    "last_name": "Adewale",
+    "email": "chinedu.adewale@example.edu",
+    "phone": "+2348000000004",
+    "admission_date": "2026-09-01",
+    "student_status": "Active",
+    "programme": {
+      "programme_code": "MBA",
+      "programme_name": "Master of Business Administration",
+      "award_level": "Masters",
+      "duration_years": 2,
+      "department": {
+        "department_code": "SBS",
+        "department_name": "School of Business Studies",
+        "office_location": "Block B"
+      }
+    },
+    "academic_records": [
+      {
+        "session_name": "2026/2027",
+        "semester": "First",
+        "courses": [
+          {
+            "course_code": "MBA8101",
+            "course_title": "Strategic Management",
+            "credit_units": 3,
+            "lecturer_name": "Grace Adeyemi",
+            "assessment_score": 30.0,
+            "examination_score": 48.0,
+            "total_score": 78.0,
+            "grade": "A",
+            "grade_point": 5.0,
+            "result_remarks": "Pass"
+          },
+          {
+            "course_code": "MBA8102",
+            "course_title": "Corporate Finance and Accounting",
+            "credit_units": 3,
+            "lecturer_name": "Grace Adeyemi",
+            "assessment_score": 26.0,
+            "examination_score": 39.0,
+            "total_score": 65.0,
+            "grade": "B",
+            "grade_point": 4.0,
+            "result_remarks": "Pass"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "_id": "672e8101a1b2c3d4e5f60005",
+    "student_number": "WCS2026002",
+    "first_name": "Zainab",
+    "last_name": "Danladi",
+    "email": "zainab.danladi@example.edu",
+    "phone": "+2348000000005",
+    "admission_date": "2026-09-01",
+    "student_status": "Active",
+    "programme": {
+      "programme_code": "BSC-CS",
+      "programme_name": "BSc Computer Science",
+      "award_level": "Undergraduate",
+      "duration_years": 4,
+      "department": {
+        "department_code": "SCT",
+        "department_name": "School of Computing and Technology",
+        "office_location": "Block A"
+      }
+    },
+    "academic_records": [
+      {
+        "session_name": "2026/2027",
+        "semester": "First",
+        "courses": [
+          {
+            "course_code": "CSC2101",
+            "course_title": "Database Systems Foundations",
+            "credit_units": 3,
+            "lecturer_name": "Chika Nwosu",
+            "assessment_score": 20.0,
+            "examination_score": 28.0,
+            "total_score": 48.0,
+            "grade": "D",
+            "grade_point": 2.0,
+            "result_remarks": "Pass"
+          },
+          {
+            "course_code": "CSC2102",
+            "course_title": "Data Structures and Algorithms",
+            "credit_units": 4,
+            "lecturer_name": "Oluwaseun Ogunleye",
+            "assessment_score": 15.0,
+            "examination_score": 22.0,
+            "total_score": 37.0,
+            "grade": "F",
+            "grade_point": 0.0,
+            "result_remarks": "Fail"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,149 @@
+============================================================
+PORTFOLIO 4: NOSQL & ADVANCED DATA MODELS VERIFICATION LOG
+Target Collection: students_transcripts
+Engine: Document Schema Validator / Aggregation Pipeline Runner
+============================================================
+
+------------------------------------------------------------
+STAGE 1: CRUD OPERATIONS VERIFICATION
+------------------------------------------------------------
+Initial document count: 5
+[CREATE] insertOne(WMIT2026099): SUCCESS (Count now: 6)
+[READ] find({ student_number: 'WMIT2026099' }): Found 1 matching document.
+[UPDATE] updateOne({ student_number: 'WMIT2026099' }, { $set: { phone: '+2348099998888' } }): SUCCESS
+[DELETE] deleteOne({ student_number: 'WMIT2026099' }): SUCCESS (Count restored: 5)
+
+------------------------------------------------------------
+STAGE 2: AGGREGATION PIPELINE 1 (CUMULATIVE GPA & STANDING)
+------------------------------------------------------------
+[
+  {
+    "student_number": "WMIT2026001",
+    "student_name": "Ada Okafor",
+    "programme": "MIT",
+    "total_credits": 6,
+    "average_mark": 78.5,
+    "gpa": 5.0,
+    "academic_standing": "First Class / Distinction"
+  },
+  {
+    "student_number": "WCS2026001",
+    "student_name": "Amaka Eze",
+    "programme": "BSC-CS",
+    "total_credits": 7,
+    "average_mark": 82.5,
+    "gpa": 5.0,
+    "academic_standing": "First Class / Distinction"
+  },
+  {
+    "student_number": "WMBA2026001",
+    "student_name": "Chinedu Adewale",
+    "programme": "MBA",
+    "total_credits": 6,
+    "average_mark": 71.5,
+    "gpa": 4.5,
+    "academic_standing": "First Class / Distinction"
+  },
+  {
+    "student_number": "WMIT2026002",
+    "student_name": "Tunde Bello",
+    "programme": "MIT",
+    "total_credits": 6,
+    "average_mark": 66.0,
+    "gpa": 4.0,
+    "academic_standing": "Second Class Upper / Credit"
+  },
+  {
+    "student_number": "WCS2026002",
+    "student_name": "Zainab Danladi",
+    "programme": "BSC-CS",
+    "total_credits": 7,
+    "average_mark": 42.5,
+    "gpa": 0.86,
+    "academic_standing": "Probation / Fail"
+  }
+]
+
+
+------------------------------------------------------------
+STAGE 3: AGGREGATION PIPELINE 2 (COURSE ENROLMENT & STATS)
+------------------------------------------------------------
+[
+  {
+    "course_code": "MIT8103",
+    "course_title": "Advanced Database Systems",
+    "credit_units": 3,
+    "enrolled_count": 2,
+    "average_score": 76.5,
+    "score_range": "70.0 - 83.0",
+    "pass_rate": "100.0%"
+  },
+  {
+    "course_code": "MIT8105",
+    "course_title": "Network Architecture and Protocols",
+    "credit_units": 3,
+    "enrolled_count": 2,
+    "average_score": 68.0,
+    "score_range": "62.0 - 74.0",
+    "pass_rate": "100.0%"
+  },
+  {
+    "course_code": "CSC2101",
+    "course_title": "Database Systems Foundations",
+    "credit_units": 3,
+    "enrolled_count": 2,
+    "average_score": 68.0,
+    "score_range": "48.0 - 88.0",
+    "pass_rate": "100.0%"
+  },
+  {
+    "course_code": "CSC2102",
+    "course_title": "Data Structures and Algorithms",
+    "credit_units": 4,
+    "enrolled_count": 2,
+    "average_score": 57.0,
+    "score_range": "37.0 - 77.0",
+    "pass_rate": "50.0%"
+  },
+  {
+    "course_code": "MBA8101",
+    "course_title": "Strategic Management",
+    "credit_units": 3,
+    "enrolled_count": 1,
+    "average_score": 78.0,
+    "score_range": "78.0 - 78.0",
+    "pass_rate": "100.0%"
+  },
+  {
+    "course_code": "MBA8102",
+    "course_title": "Corporate Finance and Accounting",
+    "credit_units": 3,
+    "enrolled_count": 1,
+    "average_score": 65.0,
+    "score_range": "65.0 - 65.0",
+    "pass_rate": "100.0%"
+  }
+]
+
+
+------------------------------------------------------------
+STAGE 4: AGGREGATION PIPELINE 3 (DEPARTMENTAL DISTINCTION STATS)
+------------------------------------------------------------
+[
+  {
+    "department_code": "SBS",
+    "department_name": "School of Business Studies",
+    "total_evaluations": 2,
+    "average_mark": 71.5,
+    "distinction_count": 1,
+    "distinction_rate": "50.0%"
+  },
+  {
+    "department_code": "SCT",
+    "department_name": "School of Computing and Technology",
+    "total_evaluations": 8,
+    "average_mark": 67.38,
+    "distinction_count": 4,
+    "distinction_rate": "50.0%"
+  }
+]
