@@ -1,0 +1,57 @@
+# ==============================================================================
+# WINNERMIT UNIVERSITY STUDENT MANAGEMENT SYSTEM (USMS)
+# PORTFOLIO 5: DISTRIBUTED & CLOUD DATABASES
+# MySQL Enterprise Replication Configuration - Primary Source (Lagos Campus)
+# Server ID: 1 | Role: Read/Write Primary Node
+# ==============================================================================
+
+[mysqld]
+# ------------------------------------------------------------------------------
+# 1. Server Identification & Networking
+# ------------------------------------------------------------------------------
+server-id                       = 1
+bind-address                    = 0.0.0.0
+port                            = 3306
+report-host                     = lagos-primary.usms.winnermit.edu.ng
+report-port                     = 3306
+
+# ------------------------------------------------------------------------------
+# 2. Binary Logging (Source Engine)
+# ------------------------------------------------------------------------------
+log-bin                         = mysql-bin
+log-bin-index                   = mysql-bin.index
+binlog_format                   = ROW
+binlog_row_image                = FULL
+binlog_expire_logs_seconds      = 604800        # Retain logs for 7 days
+max_binlog_size                 = 1073741824    # 1 GB per binary log segment
+sync_binlog                     = 1             # ACID guarantee: sync every transaction
+
+# ------------------------------------------------------------------------------
+# 3. Global Transaction Identifier (GTID) Setup
+# ------------------------------------------------------------------------------
+gtid_mode                       = ON
+enforce_gtid_consistency        = ON
+
+# ------------------------------------------------------------------------------
+# 4. Multi-Master / Sharding ID Offsets (Auto-Increment Safety)
+# ------------------------------------------------------------------------------
+auto_increment_increment        = 2
+auto_increment_offset           = 1
+
+# ------------------------------------------------------------------------------
+# 5. Database Replication Filtering (Scope Protection)
+# ------------------------------------------------------------------------------
+binlog_do_db                    = winnermit_usms
+binlog_ignore_db                = mysql
+binlog_ignore_db                = information_schema
+binlog_ignore_db                = performance_schema
+binlog_ignore_db                = sys
+
+# ------------------------------------------------------------------------------
+# 6. InnoDB Crash-Safe & Semi-Synchronous Replication
+# ------------------------------------------------------------------------------
+innodb_flush_log_at_trx_commit  = 1
+plugin-load-add                 = semisync_source.so
+rpl_semi_sync_source_enabled    = 1
+rpl_semi_sync_source_timeout    = 10000         # 10s timeout before fallback to async
+rpl_semi_sync_source_wait_for_replica_count = 1

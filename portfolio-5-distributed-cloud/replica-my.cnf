@@ -1,0 +1,58 @@
+# ==============================================================================
+# WINNERMIT UNIVERSITY STUDENT MANAGEMENT SYSTEM (USMS)
+# PORTFOLIO 5: DISTRIBUTED & CLOUD DATABASES
+# MySQL Enterprise Replication Configuration - Secondary Replica (Abuja Campus)
+# Server ID: 2 | Role: Read-Only Regional Node
+# ==============================================================================
+
+[mysqld]
+# ------------------------------------------------------------------------------
+# 1. Server Identification & Networking
+# ------------------------------------------------------------------------------
+server-id                       = 2
+bind-address                    = 0.0.0.0
+port                            = 3306
+report-host                     = abuja-replica.usms.winnermit.edu.ng
+report-port                     = 3306
+
+# ------------------------------------------------------------------------------
+# 2. Read-Only Protection (Enforce Academic Data Immutability on Replica)
+# ------------------------------------------------------------------------------
+read_only                       = ON
+super_read_only                 = ON
+
+# ------------------------------------------------------------------------------
+# 3. Relay Logging & Replication Engine
+# ------------------------------------------------------------------------------
+relay-log                       = mysql-relay-bin
+relay-log-index                 = mysql-relay-bin.index
+relay_log_info_repository       = TABLE
+master_info_repository          = TABLE
+relay_log_recovery              = ON            # Automatic crash recovery for relay logs
+max_relay_log_size              = 1073741824
+
+# ------------------------------------------------------------------------------
+# 4. Global Transaction Identifier (GTID) Setup
+# ------------------------------------------------------------------------------
+gtid_mode                       = ON
+enforce_gtid_consistency        = ON
+log_replica_updates             = ON            # Enable chained replication to cloud node
+
+# ------------------------------------------------------------------------------
+# 5. Multi-Master / Sharding ID Offsets (Auto-Increment Safety)
+# ------------------------------------------------------------------------------
+auto_increment_increment        = 2
+auto_increment_offset           = 2
+
+# ------------------------------------------------------------------------------
+# 6. Multi-Threaded Applier (High-Throughput Parallel Replication)
+# ------------------------------------------------------------------------------
+replica_parallel_type           = LOGICAL_CLOCK
+replica_parallel_workers        = 4
+replica_preserve_commit_order   = ON
+
+# ------------------------------------------------------------------------------
+# 7. Semi-Synchronous Replica Plugin
+# ------------------------------------------------------------------------------
+plugin-load-add                 = semisync_replica.so
+rpl_semi_sync_replica_enabled   = 1
