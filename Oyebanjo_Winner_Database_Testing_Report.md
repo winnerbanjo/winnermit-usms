@@ -323,4 +323,21 @@ ORDER BY d.department_code, lecturer_name;
 | **Sample Data Correctness** | **VERIFIED** | Undergraduate student Amaka Eze successfully enrolled in `CSC2101`. |
 | **Zero Side Effects** | **VERIFIED** | Zero data corruption; original files completely preserved. |
 
+---
+
+## 8. Verification Screenshots & Evidence Mapping
+
+Screenshots captured directly from MySQL Workbench are catalogued in the `evidence/` directory:
+
+| Screenshot ID | Target File | Verification Content |
+| :--- | :--- | :--- |
+| **Figure 1** | [`evidence/figure1_schemas_overview.png`](evidence/figure1_schemas_overview.png) | Schemas panel displaying all 9 tables in `winnermit_usms_test` |
+| **Figure 2** | [`evidence/figure2_table_row_counts.png`](evidence/figure2_table_row_counts.png) | Row counts query output across all 9 entities |
+| **Figure 3** | [`evidence/figure3_student_roster_join.png`](evidence/figure3_student_roster_join.png) | Relational multi-table join showing student enrolments |
+| **Figure 4** | [`evidence/figure4_student_grade_sheet.png`](evidence/figure4_student_grade_sheet.png) | Grade sheet proving InnoDB stored generated total scores |
+| **Figure 5** | [`evidence/figure5_capacity_utilization.png`](evidence/figure5_capacity_utilization.png) | Course offering capacity and utilization report (LEFT JOIN) |
+| **Figure 6** | [`evidence/figure6_negative_constraint_rejection.png`](evidence/figure6_negative_constraint_rejection.png) | Action Output console showing Error 3819 and Error 1452 |
+
+---
+
 **Final Conclusion:** Portfolio 1 database implementation is verified to the highest academic standard and is fully ready for submission evidence capture.

@@ -29,6 +29,10 @@ CONTENTS
 7. Oyebanjo_Winner_Screenshots_Guide.md
    Step-by-step checklist of evidence screenshots to capture for submission.
 
+8. Oyebanjo_Winner_Portfolio1_Submission.md
+   Master academic submission report synthesizing design, normalisation,
+   real MySQL test evidence, query demonstrations, and technical reflections.
+
 HOW TO RUN THE SQL SCRIPT
 1. Install and open MySQL Server and MySQL Workbench.
 2. Connect to your local MySQL Server.
