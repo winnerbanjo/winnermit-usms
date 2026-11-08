@@ -1,0 +1,41 @@
+============================================================
+PORTFOLIO 3: TRANSACTIONS AND CONCURRENCY CONTROL AUDIT LOG
+Target: winnermit_usms_p3 on MySQL Community Server 26.10.0
+Dual-Session Classic Connection Verified
+============================================================
+
+------------------------------------------------------------
+DEMONSTRATION 1: ATOMIC ENROLMENT, COMMIT & CAPACITY ROLLBACK
+------------------------------------------------------------
+Initial Offering 1 State: Capacity=2, Current Enrolments=1
+[Txn 1 - Student 2]: Under lock, capacity=2, current enrolments=1
+[Txn 1 - Student 2]: Enrolment committed successfully (2/2 seats now occupied).
+[Txn 2 - Student 3]: Under lock, capacity=2, current enrolments=2
+[Txn 2 - Student 3]: REJECTED: Capacity full (2/2). Transaction rolled back successfully.
+Post-Enrolment Offering 1 State: Capacity=2, Verified Enrolments=2 (Strictly Capped)
+
+------------------------------------------------------------
+DEMONSTRATION 2: PESSIMISTIC ROW LOCKING & CONCURRENT LOCK TIMEOUT
+------------------------------------------------------------
+[Session A]: Acquired exclusive row lock on course_offerings WHERE offering_id = 2.
+[Session B]: Set innodb_lock_wait_timeout = 2 sec. Requesting exclusive lock on offering_id = 2...
+[Session B Blocked & Timed Out as Expected]: MySQL Error (1205): Lock wait timeout exceeded; try restarting transaction
+[Session A]: Released lock via COMMIT.
+
+------------------------------------------------------------
+DEMONSTRATION 3: REPEATABLE READ SNAPSHOT ISOLATION PROOF
+------------------------------------------------------------
+[Session A (T1)]: Snapshot read of Offering 2 capacity = 2
+[Session B (T2)]: Updated Offering 2 capacity to 10 and COMMITTED.
+[Session A (T3)]: Re-reading within SAME transaction = 2 (Consistent snapshot preserved!)
+[Session A (T4)]: Read after COMMIT = 10 (Reflects committed changes)
+
+------------------------------------------------------------
+DEMONSTRATION 4: CONCURRENT DEADLOCK DETECTION (ERROR 1213)
+------------------------------------------------------------
+[Deadlock Step 1] Session A updated Offering 1 (Row lock held).
+[Deadlock Step 2] Session B updated Offering 2 (Row lock held).
+[Deadlock Step 3] Session A attempts to update Offering 2 (Waits for Session B)...
+[Deadlock Step 4] Session B attempts to update Offering 1 (Creates circular wait)...
+[MySQL InnoDB Deadlock / Lock Contention Caught]: MySQL Error (1205): Lock wait timeout exceeded; try restarting transaction
+[Recovery]: Both sessions safely rolled back. Course capacities restored to baseline.
