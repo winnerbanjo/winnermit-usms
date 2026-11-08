@@ -1,6 +1,6 @@
-import os
 # run_p2_benchmarks.py
 # Runs EXPLAIN and EXPLAIN ANALYZE on MySQL 26.10.0 for Portfolio 2 queries
+import os
 import subprocess
 
 MYSQLSH = "/Volumes/MySQL Workbench 26.10.0-arm64/MySQL Workbench.app/Contents/Resources/app/shell/bin/mysqlsh"

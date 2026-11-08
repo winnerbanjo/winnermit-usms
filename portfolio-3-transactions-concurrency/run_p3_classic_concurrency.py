@@ -1,6 +1,6 @@
-import os
 # run_p3_classic_concurrency.py
 # Executed via mysqlsh --py to run genuine concurrent sessions against MySQL 26.10.0
+import os
 import sys
 import time
 

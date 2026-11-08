@@ -1,7 +1,7 @@
-import os
 # run_p3_transactions.py
 # Simulates concurrent MySQL sessions on winnermit_usms_p3 to demonstrate
 # ACID properties, isolation levels, row locking, and deadlock detection.
+import os
 import subprocess
 import time
 
