@@ -255,6 +255,61 @@ JOIN courses c ON co.course_id = c.course_id;
 
 ---
 
+### Query C: Course Offering Capacity & Utilization Audit (LEFT JOIN Proof)
+```sql
+SELECT 
+    c.course_code,
+    c.course_title,
+    co.semester,
+    sess.session_name,
+    co.capacity AS max_capacity,
+    COUNT(e.enrolment_id) AS enrolled_students,
+    (co.capacity - COUNT(e.enrolment_id)) AS remaining_seats
+FROM course_offerings co
+JOIN courses c ON co.course_id = c.course_id
+JOIN academic_sessions sess ON co.session_id = sess.session_id
+LEFT JOIN enrolments e ON co.offering_id = e.offering_id
+GROUP BY co.offering_id, c.course_code, c.course_title, co.semester, sess.session_name, co.capacity;
+```
+
+**Actual Execution Result:**
+| course_code | course_title | semester | session_name | max_capacity | enrolled_students | remaining_seats |
+| :--- | :--- | :--- | :--- | :---: | :---: | :---: |
+| MIT8103 | Advanced Database Systems | First | 2026/2027 | 80 | 2 | 78 |
+| MIT8105 | Network Architecture & Protocols | First | 2026/2027 | 80 | 1 | 79 |
+| MBA8101 | Strategic Management | First | 2026/2027 | 60 | 0 | 60 |
+| CSC2101 | Database Systems Foundations | First | 2026/2027 | 100 | 1 | 99 |
+
+*Observation:* Confirms course offering 3 (`MBA8101`) correctly displays 0 enrolled students with 60 remaining seats via `LEFT JOIN` without query suppression.
+
+---
+
+### Query D: Departmental Academic Staff Teaching Distribution
+```sql
+SELECT 
+    d.department_code,
+    d.department_name,
+    CONCAT(l.first_name, ' ', l.last_name) AS lecturer_name,
+    l.staff_number,
+    COUNT(co.offering_id) AS assigned_offerings
+FROM departments d
+JOIN lecturers l ON d.department_id = l.department_id
+LEFT JOIN course_offerings co ON l.lecturer_id = co.lecturer_id
+GROUP BY d.department_code, d.department_name, l.lecturer_id, l.first_name, l.last_name, l.staff_number
+ORDER BY d.department_code, lecturer_name;
+```
+
+**Actual Execution Result:**
+| department_code | department_name | lecturer_name | staff_number | assigned_offerings |
+| :--- | :--- | :--- | :--- | :---: |
+| SBS | School of Business Studies | Grace Adeyemi | WML003 | 1 |
+| SCT | School of Computing and Technology | Chika Nwosu | WML001 | 2 |
+| SCT | School of Computing and Technology | Ibrahim Yusuf | WML002 | 1 |
+
+*Observation:* Demonstrates that Lecturer Chika Nwosu handles 2 distinct offerings (`MIT8103` and `CSC2101`), confirming multiple course offering assignments per lecturer.
+
+---
+
 ## 7. Final Assessment & Verification Status
 
 | Portfolio 1 Requirement | Status | Verification Summary |
