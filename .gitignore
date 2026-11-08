@@ -1,0 +1,45 @@
+# ============================================================
+# Git Ignore Configuration for WinnerMIT University Project
+# MIT 8103 - Advanced Database Systems
+# ============================================================
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment & Sensitive Credentials
+*.env
+*.env.*
+*.cnf
+*.ini
+*.pem
+*.key
+*.cert
+*secret*
+*credential*
+*password*
+
+# Editor & IDE Directories
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# Database dumps, temporary logs & scratch files
+*.log
+*.dump
+*.sql.gz
+*.sql.zip
+*.tmp
+scratch/
+
+# Local backup files (untracked to keep repository clean)
+*.bak
