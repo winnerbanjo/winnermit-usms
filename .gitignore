@@ -38,6 +38,7 @@ Thumbs.db
 *.dump
 *.sql.gz
 *.sql.zip
+*.zip
 *.tmp
 scratch/
 
