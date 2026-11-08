@@ -1,0 +1,371 @@
+============================================================
+PORTFOLIO 2: QUERY PROCESSING AND OPTIMISATION EXECUTION LOG
+Target: winnermit_usms_p2 on MySQL 26.10.0
+============================================================
+
+------------------------------------------------------------
+STAGE 1: BASELINE EXPLAIN & EXPLAIN ANALYZE (BEFORE OPTIMISATION)
+------------------------------------------------------------
+
+### Query 1: Student Academic Performance & GPA Analysis
+
+--- EXPLAIN FORMAT=TREE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: average_score DESC
+    -> Filter: (average_score >= 60.00)
+        -> Table scan on <temporary>
+            -> Aggregate using temporary table
+                -> Nested loop inner join  (cost=61.6 rows=11.2)
+                    -> Nested loop inner join  (cost=53.8 rows=22.3)
+                        -> Nested loop inner join  (cost=46 rows=22.3)
+                            -> Nested loop inner join  (cost=38.2 rows=22.3)
+                                -> Nested loop inner join  (cost=30.4 rows=22.3)
+                                    -> Filter: (r.result_remarks = 'Pass')  (cost=22.6 rows=22.3)
+                                        -> Table scan on r  (cost=22.6 rows=223)
+                                    -> Single-row index lookup on e using PRIMARY (enrolment_id = r.enrolment_id)  (cost=0.254 rows=1)
+                                -> Single-row index lookup on co using PRIMARY (offering_id = e.offering_id)  (cost=0.254 rows=1)
+                            -> Single-row index lookup on c using PRIMARY (course_id = co.course_id)  (cost=0.254 rows=1)
+                        -> Single-row index lookup on s using PRIMARY (student_id = e.student_id)  (cost=0.254 rows=1)
+                    -> Filter: (p.department_id = '1')  (cost=0.252 rows=0.5)
+                        -> Single-row index lookup on p using PRIMARY (programme_id = s.programme_id)  (cost=0.252 rows=1)
+
+
+--- EXPLAIN ANALYZE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: average_score DESC  (actual time=7.07..7.08 rows=48 loops=1)
+    -> Filter: (average_score >= 60.00)  (actual time=6.43..6.48 rows=48 loops=1)
+        -> Table scan on <temporary>  (actual time=6.42..6.44 rows=51 loops=1)
+            -> Aggregate using temporary table  (actual time=6.42..6.42 rows=51 loops=1)
+                -> Nested loop inner join  (cost=61.6 rows=11.2) (actual time=0.312..2.18 rows=125 loops=1)
+                    -> Nested loop inner join  (cost=53.8 rows=22.3) (actual time=0.259..1.91 rows=223 loops=1)
+                        -> Nested loop inner join  (cost=46 rows=22.3) (actual time=0.224..1.65 rows=223 loops=1)
+                            -> Nested loop inner join  (cost=38.2 rows=22.3) (actual time=0.198..1.22 rows=223 loops=1)
+                                -> Nested loop inner join  (cost=30.4 rows=22.3) (actual time=0.176..0.809 rows=223 loops=1)
+                                    -> Filter: (r.result_remarks = 'Pass')  (cost=22.6 rows=22.3) (actual time=0.136..0.326 rows=223 loops=1)
+                                        -> Table scan on r  (cost=22.6 rows=223) (actual time=0.131..0.266 rows=223 loops=1)
+                                    -> Single-row index lookup on e using PRIMARY (enrolment_id = r.enrolment_id)  (cost=0.254 rows=1) (actual time=0.00196..0.00199 rows=1 loops=223)
+                                -> Single-row index lookup on co using PRIMARY (offering_id = e.offering_id)  (cost=0.254 rows=1) (actual time=0.00158..0.00168 rows=1 loops=223)
+                            -> Single-row index lookup on c using PRIMARY (course_id = co.course_id)  (cost=0.254 rows=1) (actual time=0.0017..0.00174 rows=1 loops=223)
+                        -> Single-row index lookup on s using PRIMARY (student_id = e.student_id)  (cost=0.254 rows=1) (actual time=980e-6..0.00101 rows=1 loops=223)
+                    -> Filter: (p.department_id = '1')  (cost=0.252 rows=0.5) (actual time=968e-6..0.00103 rows=0.561 loops=223)
+                        -> Single-row index lookup on p using PRIMARY (programme_id = s.programme_id)  (cost=0.252 rows=1) (actual time=731e-6..768e-6 rows=1 loops=223)
+
+
+
+==================================================
+
+### Query 2: Course Enrolment Demand & Utilization
+
+--- EXPLAIN FORMAT=TREE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: enrolled_count DESC\n    -> Filter: (enrolled_count >= 5)\n        -> Table scan on <temporary>\n            -> Aggregate using temporary table\n                -> Nested loop left join  (cost=63.9 rows=122)\n                    -> Nested loop inner join  (cost=21.2 rows=122)\n                        -> Nested loop inner join  (cost=6 rows=12)\n                            -> Index lookup on co using fk_p2_off_sess (session_id = '2')  (cost=1.8 rows=12)\n                            -> Single-row index lookup on c using PRIMARY (course_id = co.course_id)  (cost=0.258 rows=1)\n                        -> Covering index lookup on e using fk_p2_enr_off (offering_id = co.offering_id)  (cost=0.337 rows=10.2)\n                    -> Single-row index lookup on r using enrolment_id (enrolment_id = e.enrolment_id)  (cost=0.251 rows=1)\n
+
+--- EXPLAIN ANALYZE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: enrolled_count DESC  (actual time=1.41..1.42 rows=12 loops=1)
+    -> Filter: (enrolled_count >= 5)  (actual time=1.35..1.35 rows=12 loops=1)
+        -> Table scan on <temporary>  (actual time=1.34..1.34 rows=12 loops=1)
+            -> Aggregate using temporary table  (actual time=1.34..1.34 rows=12 loops=1)
+                -> Nested loop left join  (cost=63.9 rows=122) (actual time=0.111..0.712 rows=121 loops=1)
+                    -> Nested loop inner join  (cost=21.2 rows=122) (actual time=0.081..0.249 rows=121 loops=1)
+                        -> Nested loop inner join  (cost=6 rows=12) (actual time=0.0557..0.0852 rows=12 loops=1)
+                            -> Index lookup on co using fk_p2_off_sess (session_id = '2')  (cost=1.8 rows=12) (actual time=0.0406..0.0464 rows=12 loops=1)
+                            -> Single-row index lookup on c using PRIMARY (course_id = co.course_id)  (cost=0.258 rows=1) (actual time=0.00295..0.00299 rows=1 loops=12)
+                        -> Covering index lookup on e using fk_p2_enr_off (offering_id = co.offering_id)  (cost=0.337 rows=10.2) (actual time=0.00925..0.0129 rows=10.1 loops=12)
+                    -> Single-row index lookup on r using enrolment_id (enrolment_id = e.enrolment_id)  (cost=0.251 rows=1) (actual time=0.00361..0.00364 rows=0.926 loops=121)
+
+
+
+==================================================
+
+### Query 3: At-Risk Student Early Warning Subquery
+
+--- EXPLAIN FORMAT=TREE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: overall_avg
+    -> Stream results  (cost=60.2 rows=22.3)
+        -> Inner hash join (p.programme_id = s.programme_id)  (cost=60.2 rows=22.3)
+            -> Table scan on p  (cost=0.351 rows=6)
+            -> Hash
+                -> Nested loop inner join  (cost=46.6 rows=22.3)
+                    -> Table scan on <subquery3>  (cost=35.6..38.3 rows=22.3)
+                        -> Materialize with deduplication  (cost=35.5..35.5 rows=22.3)
+                            -> Nested loop inner join  (cost=30.4 rows=22.3)
+                                -> Filter: (r.grade = 'F')  (cost=22.6 rows=22.3)
+                                    -> Table scan on r  (cost=22.6 rows=223)
+                                -> Single-row index lookup on e using PRIMARY (enrolment_id = r.enrolment_id)  (cost=0.254 rows=1)
+                    -> Single-row index lookup on s using PRIMARY (student_id = `<subquery3>`.student_id)  (cost=6.2 rows=1)
+-> Select #2 (subquery in projection; dependent)
+    -> Aggregate: avg(r2.total_score)  (cost=1.91 rows=1)
+        -> Nested loop inner join  (cost=1.35 rows=2.44)
+            -> Covering index lookup on e2 using uq_p2_stud_offering (student_id = s.student_id)  (cost=0.495 rows=2.44)
+            -> Single-row index lookup on r2 using enrolment_id (enrolment_id = e2.enrolment_id)  (cost=0.291 rows=1)
+
+
+--- EXPLAIN ANALYZE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: overall_avg  (actual time=0.195..0.195 rows=0 loops=1)
+    -> Stream results  (cost=60.2 rows=22.3) (actual time=0.19..0.19 rows=0 loops=1)
+        -> Inner hash join (p.programme_id = s.programme_id)  (cost=60.2 rows=22.3) (actual time=0.187..0.187 rows=0 loops=1)
+            -> Table scan on p  (cost=0.351 rows=6) (never executed)
+            -> Hash
+                -> Nested loop inner join  (cost=46.6 rows=22.3) (actual time=0.181..0.181 rows=0 loops=1)
+                    -> Table scan on <subquery3>  (cost=35.6..38.3 rows=22.3) (actual time=0.18..0.18 rows=0 loops=1)
+                        -> Materialize with deduplication  (cost=35.5..35.5 rows=22.3) (actual time=0.18..0.18 rows=0 loops=1)
+                            -> Nested loop inner join  (cost=30.4 rows=22.3) (actual time=0.178..0.178 rows=0 loops=1)
+                                -> Filter: (r.grade = 'F')  (cost=22.6 rows=22.3) (actual time=0.178..0.178 rows=0 loops=1)
+                                    -> Table scan on r  (cost=22.6 rows=223) (actual time=0.0944..0.157 rows=223 loops=1)
+                                -> Single-row index lookup on e using PRIMARY (enrolment_id = r.enrolment_id)  (cost=0.254 rows=1) (never executed)
+                    -> Single-row index lookup on s using PRIMARY (student_id = `<subquery3>`.student_id)  (cost=6.2 rows=1) (never executed)
+
+
+
+==================================================
+
+### Query 4: Departmental Teaching Workload & Distinction Rate
+
+--- EXPLAIN FORMAT=TREE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: d.department_code, distinction_percentage DESC
+    -> Stream results
+        -> Group aggregate: count(enrolments.enrolment_id), sum(tmp_field), count(distinct course_offerings.offering_id), count(enrolments.enrolment_id), sum(tmp_field)
+            -> Sort: d.department_code, d.department_name, l.lecturer_id, l.first_name, l.last_name
+                -> Stream results  (cost=96.2 rows=244)
+                    -> Nested loop inner join  (cost=96.2 rows=244)
+                        -> Nested loop inner join  (cost=56.6 rows=244)
+                            -> Nested loop inner join  (cost=26.1 rows=24)
+                                -> Inner hash join (no condition)  (cost=10.5 rows=96)
+                                    -> Covering index scan on co using fk_p2_off_lect  (cost=0.663 rows=24)
+                                    -> Hash
+                                        -> Table scan on d  (cost=0.65 rows=4)
+                                -> Filter: (l.department_id = d.department_id)  (cost=0.0628 rows=0.25)
+                                    -> Single-row index lookup on l using PRIMARY (lecturer_id = co.lecturer_id)  (cost=0.0628 rows=1)
+                            -> Covering index lookup on e using fk_p2_enr_off (offering_id = co.offering_id)  (cost=0.295 rows=10.2)
+                        -> Single-row index lookup on r using enrolment_id (enrolment_id = e.enrolment_id)  (cost=0.0629 rows=1)
+
+
+--- EXPLAIN ANALYZE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: d.department_code, distinction_percentage DESC  (actual time=7.89..7.9 rows=12 loops=1)
+    -> Stream results  (actual time=7.57..7.86 rows=12 loops=1)
+        -> Group aggregate: count(enrolments.enrolment_id), sum(tmp_field), count(distinct course_offerings.offering_id), count(enrolments.enrolment_id), sum(tmp_field)  (actual time=7.57..7.84 rows=12 loops=1)
+            -> Sort: d.department_code, d.department_name, l.lecturer_id, l.first_name, l.last_name  (actual time=7.53..7.58 rows=223 loops=1)
+                -> Stream results  (cost=96.2 rows=244) (actual time=4.32..6.05 rows=223 loops=1)
+                    -> Nested loop inner join  (cost=96.2 rows=244) (actual time=4.3..5.54 rows=223 loops=1)
+                        -> Nested loop inner join  (cost=56.6 rows=244) (actual time=4.26..4.66 rows=244 loops=1)
+                            -> Nested loop inner join  (cost=26.1 rows=24) (actual time=4.24..4.42 rows=24 loops=1)
+                                -> Inner hash join (no condition)  (cost=10.5 rows=96) (actual time=4.19..4.27 rows=96 loops=1)
+                                    -> Covering index scan on co using fk_p2_off_lect  (cost=0.663 rows=24) (actual time=1.04..1.1 rows=24 loops=1)
+                                    -> Hash
+                                        -> Table scan on d  (cost=0.65 rows=4) (actual time=1.92..1.93 rows=4 loops=1)
+                                -> Filter: (l.department_id = d.department_id)  (cost=0.0628 rows=0.25) (actual time=0.00141..0.00144 rows=0.25 loops=96)
+                                    -> Single-row index lookup on l using PRIMARY (lecturer_id = co.lecturer_id)  (cost=0.0628 rows=1) (actual time=825e-6..857e-6 rows=1 loops=96)
+                            -> Covering index lookup on e using fk_p2_enr_off (offering_id = co.offering_id)  (cost=0.295 rows=10.2) (actual time=0.00619..0.00922 rows=10.2 loops=24)
+                        -> Single-row index lookup on r using enrolment_id (enrolment_id = e.enrolment_id)  (cost=0.0629 rows=1) (actual time=0.00339..0.00342 rows=0.914 loops=244)
+
+
+
+==================================================
+
+------------------------------------------------------------
+STAGE 2: APPLYING TARGETED SECONDARY INDEXES
+------------------------------------------------------------
+
+Executing: CREATE INDEX idx_p2_enr_stud ON enrolments(student_id);
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+
+Records: 0  Duplicates: 0  Warnings: 0
+
+Executing: CREATE INDEX idx_p2_res_rem_score ON results(result_remarks, total_score);
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+
+Records: 0  Duplicates: 0  Warnings: 0
+
+Executing: CREATE INDEX idx_p2_off_sess_sem ON course_offerings(session_id, semester);
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+
+Records: 0  Duplicates: 0  Warnings: 0
+
+Executing: CREATE INDEX idx_p2_res_grade ON results(grade);
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+
+Records: 0  Duplicates: 0  Warnings: 0
+
+
+==================================================
+
+------------------------------------------------------------
+STAGE 3: OPTIMISED EXPLAIN & EXPLAIN ANALYZE (AFTER INDEXING)
+------------------------------------------------------------
+
+### Query 1: Student Academic Performance & GPA Analysis [OPTIMISED]
+
+--- EXPLAIN FORMAT=TREE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: average_score DESC
+    -> Filter: (average_score >= 60.00)
+        -> Table scan on <temporary>
+            -> Aggregate using temporary table
+                -> Nested loop inner join  (cost=161 rows=122)
+                    -> Nested loop inner join  (cost=118 rows=122)
+                        -> Nested loop inner join  (cost=75.5 rows=122)
+                            -> Nested loop inner join  (cost=32.8 rows=122)
+                                -> Nested loop inner join  (cost=8.05 rows=50)
+                                    -> Index lookup on p using fk_p2_prog_dept (department_id = '1')  (cost=0.8 rows=3)
+                                    -> Index lookup on s using fk_p2_stud_prog (programme_id = p.programme_id)  (cost=1.31 rows=16.7)
+                                -> Covering index lookup on e using uq_p2_stud_offering (student_id = s.student_id)  (cost=0.255 rows=2.44)
+                            -> Single-row index lookup on co using PRIMARY (offering_id = e.offering_id)  (cost=0.251 rows=1)
+                        -> Single-row index lookup on c using PRIMARY (course_id = co.course_id)  (cost=0.251 rows=1)
+                    -> Filter: (r.result_remarks = 'Pass')  (cost=0.251 rows=1)
+                        -> Single-row index lookup on r using enrolment_id (enrolment_id = e.enrolment_id)  (cost=0.251 rows=1)
+
+
+--- EXPLAIN ANALYZE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: average_score DESC  (actual time=3.28..3.3 rows=48 loops=1)
+    -> Filter: (average_score >= 60.00)  (actual time=3.17..3.2 rows=48 loops=1)
+        -> Table scan on <temporary>  (actual time=3.17..3.18 rows=51 loops=1)
+            -> Aggregate using temporary table  (actual time=3.16..3.16 rows=51 loops=1)
+                -> Nested loop inner join  (cost=161 rows=122) (actual time=0.264..1.4 rows=125 loops=1)
+                    -> Nested loop inner join  (cost=118 rows=122) (actual time=0.238..0.952 rows=134 loops=1)
+                        -> Nested loop inner join  (cost=75.5 rows=122) (actual time=0.218..0.722 rows=134 loops=1)
+                            -> Nested loop inner join  (cost=32.8 rows=122) (actual time=0.189..0.468 rows=134 loops=1)
+                                -> Nested loop inner join  (cost=8.05 rows=50) (actual time=0.167..0.264 rows=55 loops=1)
+                                    -> Index lookup on p using fk_p2_prog_dept (department_id = '1')  (cost=0.8 rows=3) (actual time=0.0943..0.0959 rows=3 loops=1)
+                                    -> Index lookup on s using fk_p2_stud_prog (programme_id = p.programme_id)  (cost=1.31 rows=16.7) (actual time=0.034..0.0546 rows=18.3 loops=3)
+                                -> Covering index lookup on e using uq_p2_stud_offering (student_id = s.student_id)  (cost=0.255 rows=2.44) (actual time=0.00234..0.00344 rows=2.44 loops=55)
+                            -> Single-row index lookup on co using PRIMARY (offering_id = e.offering_id)  (cost=0.251 rows=1) (actual time=0.00169..0.00172 rows=1 loops=134)
+                        -> Single-row index lookup on c using PRIMARY (course_id = co.course_id)  (cost=0.251 rows=1) (actual time=0.00151..0.00155 rows=1 loops=134)
+                    -> Filter: (r.result_remarks = 'Pass')  (cost=0.251 rows=1) (actual time=0.00303..0.00313 rows=0.933 loops=134)
+                        -> Single-row index lookup on r using enrolment_id (enrolment_id = e.enrolment_id)  (cost=0.251 rows=1) (actual time=0.00269..0.00273 rows=0.933 loops=134)
+
+
+
+==================================================
+
+### Query 2: Course Enrolment Demand & Utilization [OPTIMISED]
+
+--- EXPLAIN FORMAT=TREE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: enrolled_count DESC\n    -> Filter: (enrolled_count >= 5)\n        -> Table scan on <temporary>\n            -> Aggregate using temporary table\n                -> Nested loop left join  (cost=63.9 rows=122)\n                    -> Nested loop inner join  (cost=21.2 rows=122)\n                        -> Nested loop inner join  (cost=6 rows=12)\n                            -> Index lookup on co using idx_p2_off_sess_sem (session_id = '2')  (cost=1.8 rows=12)\n                            -> Single-row index lookup on c using PRIMARY (course_id = co.course_id)  (cost=0.258 rows=1)\n                        -> Covering index lookup on e using fk_p2_enr_off (offering_id = co.offering_id)  (cost=0.337 rows=10.2)\n                    -> Single-row index lookup on r using enrolment_id (enrolment_id = e.enrolment_id)  (cost=0.251 rows=1)\n
+
+--- EXPLAIN ANALYZE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: enrolled_count DESC  (actual time=0.94..0.942 rows=12 loops=1)
+    -> Filter: (enrolled_count >= 5)  (actual time=0.916..0.92 rows=12 loops=1)
+        -> Table scan on <temporary>  (actual time=0.914..0.917 rows=12 loops=1)
+            -> Aggregate using temporary table  (actual time=0.912..0.912 rows=12 loops=1)
+                -> Nested loop left join  (cost=63.9 rows=122) (actual time=0.0732..0.592 rows=121 loops=1)
+                    -> Nested loop inner join  (cost=21.2 rows=122) (actual time=0.0574..0.17 rows=121 loops=1)
+                        -> Nested loop inner join  (cost=6 rows=12) (actual time=0.0335..0.0598 rows=12 loops=1)
+                            -> Index lookup on co using idx_p2_off_sess_sem (session_id = '2')  (cost=1.8 rows=12) (actual time=0.027..0.0315 rows=12 loops=1)
+                            -> Single-row index lookup on c using PRIMARY (course_id = co.course_id)  (cost=0.258 rows=1) (actual time=0.00206..0.00211 rows=1 loops=12)
+                        -> Covering index lookup on e using fk_p2_enr_off (offering_id = co.offering_id)  (cost=0.337 rows=10.2) (actual time=0.00485..0.00759 rows=10.1 loops=12)
+                    -> Single-row index lookup on r using enrolment_id (enrolment_id = e.enrolment_id)  (cost=0.251 rows=1) (actual time=0.00328..0.00331 rows=0.926 loops=121)
+
+
+
+==================================================
+
+### Query 3: At-Risk Student Early Warning Subquery [OPTIMISED]
+
+--- EXPLAIN FORMAT=TREE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: overall_avg
+    -> Stream results  (cost=4.14 rows=1)
+        -> Nested loop inner join  (cost=4.14 rows=1)
+            -> Nested loop inner join  (cost=3.79 rows=1)
+                -> Table scan on <subquery3>  (cost=3.44..3.44 rows=1)
+                    -> Materialize with deduplication  (cost=0.93..0.93 rows=1)
+                        -> Nested loop inner join  (cost=0.7 rows=1)
+                            -> Index lookup on r using idx_p2_res_grade (grade = 'F')  (cost=0.35 rows=1)
+                            -> Single-row index lookup on e using PRIMARY (enrolment_id = r.enrolment_id)  (cost=0.35 rows=1)
+                -> Filter: (s.programme_id is not null)  (cost=0.35 rows=1)
+                    -> Single-row index lookup on s using PRIMARY (student_id = `<subquery3>`.student_id)  (cost=0.35 rows=1)
+            -> Single-row index lookup on p using PRIMARY (programme_id = s.programme_id)  (cost=0.35 rows=1)
+-> Select #2 (subquery in projection; dependent)
+    -> Aggregate: avg(r2.total_score)  (cost=1.91 rows=1)
+        -> Nested loop inner join  (cost=1.35 rows=2.44)
+            -> Covering index lookup on e2 using idx_p2_enr_stud (student_id = s.student_id)  (cost=0.494 rows=2.44)
+            -> Single-row index lookup on r2 using enrolment_id (enrolment_id = e2.enrolment_id)  (cost=0.291 rows=1)
+
+
+--- EXPLAIN ANALYZE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: overall_avg  (actual time=0.029..0.029 rows=0 loops=1)
+    -> Stream results  (cost=4.14 rows=1) (actual time=0.0244..0.0244 rows=0 loops=1)
+        -> Nested loop inner join  (cost=4.14 rows=1) (actual time=0.0218..0.0218 rows=0 loops=1)
+            -> Nested loop inner join  (cost=3.79 rows=1) (actual time=0.0213..0.0213 rows=0 loops=1)
+                -> Table scan on <subquery3>  (cost=3.44..3.44 rows=1) (actual time=0.021..0.021 rows=0 loops=1)
+                    -> Materialize with deduplication  (cost=0.93..0.93 rows=1) (actual time=0.0198..0.0198 rows=0 loops=1)
+                        -> Nested loop inner join  (cost=0.7 rows=1) (actual time=0.0185..0.0185 rows=0 loops=1)
+                            -> Index lookup on r using idx_p2_res_grade (grade = 'F')  (cost=0.35 rows=1) (actual time=0.0182..0.0182 rows=0 loops=1)
+                            -> Single-row index lookup on e using PRIMARY (enrolment_id = r.enrolment_id)  (cost=0.35 rows=1) (never executed)
+                -> Filter: (s.programme_id is not null)  (cost=0.35 rows=1) (never executed)
+                    -> Single-row index lookup on s using PRIMARY (student_id = `<subquery3>`.student_id)  (cost=0.35 rows=1) (never executed)
+            -> Single-row index lookup on p using PRIMARY (programme_id = s.programme_id)  (cost=0.35 rows=1) (never executed)
+
+
+
+==================================================
+
+### Query 4: Departmental Teaching Workload & Distinction Rate [OPTIMISED]
+
+--- EXPLAIN FORMAT=TREE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: d.department_code, distinction_percentage DESC
+    -> Stream results
+        -> Group aggregate: count(enrolments.enrolment_id), sum(tmp_field), count(distinct course_offerings.offering_id), count(enrolments.enrolment_id), sum(tmp_field)
+            -> Sort: d.department_code, d.department_name, l.lecturer_id, l.first_name, l.last_name
+                -> Stream results  (cost=96.2 rows=244)
+                    -> Nested loop inner join  (cost=96.2 rows=244)
+                        -> Nested loop inner join  (cost=56.6 rows=244)
+                            -> Nested loop inner join  (cost=26.1 rows=24)
+                                -> Inner hash join (no condition)  (cost=10.5 rows=96)
+                                    -> Covering index scan on co using fk_p2_off_lect  (cost=0.663 rows=24)
+                                    -> Hash
+                                        -> Table scan on d  (cost=0.65 rows=4)
+                                -> Filter: (l.department_id = d.department_id)  (cost=0.0628 rows=0.25)
+                                    -> Single-row index lookup on l using PRIMARY (lecturer_id = co.lecturer_id)  (cost=0.0628 rows=1)
+                            -> Covering index lookup on e using fk_p2_enr_off (offering_id = co.offering_id)  (cost=0.295 rows=10.2)
+                        -> Single-row index lookup on r using enrolment_id (enrolment_id = e.enrolment_id)  (cost=0.0629 rows=1)
+
+
+--- EXPLAIN ANALYZE ---
+[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+EXPLAIN
+-> Sort: d.department_code, distinction_percentage DESC  (actual time=1.87..1.87 rows=12 loops=1)
+    -> Stream results  (actual time=1.56..1.84 rows=12 loops=1)
+        -> Group aggregate: count(enrolments.enrolment_id), sum(tmp_field), count(distinct course_offerings.offering_id), count(enrolments.enrolment_id), sum(tmp_field)  (actual time=1.56..1.82 rows=12 loops=1)
+            -> Sort: d.department_code, d.department_name, l.lecturer_id, l.first_name, l.last_name  (actual time=1.53..1.57 rows=223 loops=1)
+                -> Stream results  (cost=96.2 rows=244) (actual time=0.189..1.3 rows=223 loops=1)
+                    -> Nested loop inner join  (cost=96.2 rows=244) (actual time=0.18..1.04 rows=223 loops=1)
+                        -> Nested loop inner join  (cost=56.6 rows=244) (actual time=0.16..0.395 rows=244 loops=1)
+                            -> Nested loop inner join  (cost=26.1 rows=24) (actual time=0.149..0.236 rows=24 loops=1)
+                                -> Inner hash join (no condition)  (cost=10.5 rows=96) (actual time=0.118..0.138 rows=96 loops=1)
+                                    -> Covering index scan on co using fk_p2_off_lect  (cost=0.663 rows=24) (actual time=0.0299..0.0358 rows=24 loops=1)
+                                    -> Hash
+                                        -> Table scan on d  (cost=0.65 rows=4) (actual time=0.0638..0.0681 rows=4 loops=1)
+                                -> Filter: (l.department_id = d.department_id)  (cost=0.0628 rows=0.25) (actual time=857e-6..883e-6 rows=0.25 loops=96)
+                                    -> Single-row index lookup on l using PRIMARY (lecturer_id = co.lecturer_id)  (cost=0.0628 rows=1) (actual time=615e-6..648e-6 rows=1 loops=96)
+                            -> Covering index lookup on e using fk_p2_enr_off (offering_id = co.offering_id)  (cost=0.295 rows=10.2) (actual time=0.0034..0.00584 rows=10.2 loops=24)
+                        -> Single-row index lookup on r using enrolment_id (enrolment_id = e.enrolment_id)  (cost=0.0629 rows=1) (actual time=0.00246..0.00249 rows=0.914 loops=244)
+
+
+
+==================================================
