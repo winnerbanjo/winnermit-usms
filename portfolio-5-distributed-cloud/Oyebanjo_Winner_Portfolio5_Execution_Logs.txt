@@ -1,0 +1,74 @@
+[1m[94m==============================================================================[0m
+[1m[94m   WINNERMIT UNIVERSITY STUDENT MANAGEMENT SYSTEM (USMS)                     [0m
+[1m[94m   PORTFOLIO 5: DISTRIBUTED & CLOUD DATABASE ARCHITECTURE SIMULATION         [0m
+[1m[94m==============================================================================[0m
+
+[1m[SECTION 1: DATA DISTRIBUTION & SHARD ROUTING][0m
+  • Inserted MIT-2026-001 (Winner Oyebanjo, Dept: D01) -> Assigned to Node SHARD_01
+  • Inserted MIT-2026-002 (Amina Bello, Dept: D01) -> Assigned to Node SHARD_01
+  • Inserted MIT-2026-003 (Chukwudi Eze, Dept: D02) -> Assigned to Node SHARD_01
+  • Inserted MIT-2026-004 (Fatima Abubakar, Dept: D03) -> Assigned to Node SHARD_02
+  • Inserted MIT-2026-005 (Olumide Bakare, Dept: D04) -> Assigned to Node SHARD_02
+  • Inserted MIT-2026-006 (Zainab Sanusi, Dept: D04) -> Assigned to Node SHARD_02
+  • Inserted MIT-2026-007 (David Adeleke, Dept: D05) -> Assigned to Node SHARD_03
+  • Inserted MIT-2026-008 (Grace Okon, Dept: D06) -> Assigned to Node SHARD_03
+
+  Distribution Summary:
+    - SHARD_01 (Lagos Main Campus): 3 active student records
+    - SHARD_02 (Abuja Northern Campus): 3 active student records
+    - SHARD_03 (Cloud Online Campus): 2 active student records
+
+[1m[SECTION 2: QUERY ROUTING PERFORMANCE BENCHMARK][0m
+  [Point Query] Lookup student MIT-2026-001 in Dept D01:
+    └─ Routed directly to: SHARD_01 (Lagos Main Campus)
+    └─ Execution Latency: 0.001 ms
+    └─ Result: Winner Oyebanjo, CGPA: 3.92
+
+  [Scatter-Gather Query] Find all Honors Students (CGPA >= 3.70) across ALL Campuses:
+    └─ Contacted Shards: SHARD_01, SHARD_02, SHARD_03
+    └─ Execution Latency: 0.006 ms
+    └─ Total Matches Found: 4
+       * Winner Oyebanjo (MIT-2026-001) - CGPA: 3.92 [Lagos Main]
+       * Amina Bello (MIT-2026-002) - CGPA: 3.75 [Lagos Main]
+       * Fatima Abubakar (MIT-2026-004) - CGPA: 3.85 [Abuja Northern]
+
+[1m[SECTION 3: DISTRIBUTED TRANSACTIONS (TWO-PHASE COMMIT - SUCCESS SCENARIO)][0m
+  [COORDINATOR] Initiating 2PC Transaction TXN-2PC-202601: Transferring MIT-2026-003 from Lagos Main Campus to Abuja Northern Campus
+  [COORDINATOR -> PHASE 1] Broadcasting PREPARE request to SHARD_01 and SHARD_02
+    └─ Shard SHARD_01 (Lagos Main Campus) voted: YES
+    └─ Shard SHARD_02 (Abuja Northern Campus) voted: YES
+  [COORDINATOR -> PHASE 2] Unanimous YES votes. Issuing GLOBAL COMMIT...
+    └─ Both nodes committed successfully. Transaction TXN-2PC-202601 COMMITTED (ACID Verified).
+  Verification:
+    - Record in SHARD_01 (Source): None
+    - Record in SHARD_02 (Target): {'student_id': 'MIT-2026-003', 'name': 'Chukwudi Eze', 'department_id': 'D04', 'cgpa': 3.4, 'campus': 'Abuja Northern'}
+
+[1m[SECTION 4: DISTRIBUTED TRANSACTIONS (TWO-PHASE COMMIT - NODE FAILURE / ROLLBACK)][0m
+  [SIMULATION] Simulating fiber cut / partition: Node SHARD_03 (Cloud Online) set to OFFLINE.
+  [COORDINATOR] Initiating 2PC Transaction TXN-2PC-202602: Transferring MIT-2026-001 from Lagos Main Campus to Cloud Online Campus
+  [COORDINATOR -> PHASE 1] Broadcasting PREPARE request to SHARD_01 and SHARD_03
+    └─ Shard SHARD_01 (Lagos Main Campus) voted: YES
+    └─ Shard SHARD_03 (Cloud Online Campus) voted: NO
+  [COORDINATOR -> PHASE 2] Participant voted NO or failed. Issuing GLOBAL ROLLBACK...
+    └─ All participants rolled back. Atomicity strictly maintained.
+  Verification of Atomicity Preservation:
+    - Record in SHARD_01 (Source): Still exists! (Safe) -> Winner Oyebanjo
+    - Record in SHARD_03 (Target): Not inserted! (Safe)
+
+[1m[SECTION 5: CAP THEOREM EMPIRICAL ANALYSIS (CP VS AP MODES IN USMS)][0m
+  Scenario: Network partition occurs between Lagos Core Datacenter and Abuja Replica Node.
+  Evaluating two system modes during partition:
+
+  1. Consistency + Partition Tolerance (CP Mode) - Example: Course Registration & Seat Allocation
+     - Replica detects split-brain risk and disallows seat enrollment writes.
+     - Result: Write requests rejected; seat capacity cannot be oversubscribed.
+     - Trade-off: High Consistency guaranteed at the cost of transient availability.
+
+  2. Availability + Partition Tolerance (AP Mode) - Example: Student Portal Transcript & Timetable Viewing
+     - Replica serves cached transcript data locally with a header 'Stale: May lag by 2.5s'.
+     - Result: 100% portal uptime for students viewing schedules.
+     - Trade-off: High Availability preserved with Eventual Consistency.
+
+[1m[92m==============================================================================[0m
+[1m[92m   PORTFOLIO 5 SIMULATION COMPLETE: ALL DISTRIBUTED SCENARIOS VERIFIED         [0m
+[1m[92m==============================================================================[0m
